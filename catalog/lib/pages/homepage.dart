@@ -1,7 +1,9 @@
 import 'package:catalog/models/catalog.dart';
 import 'package:catalog/pages/home_detail.dart';
+import 'package:catalog/utils/routes.dart';
 import 'package:catalog/widgets/ItemWidget.dart';
 import 'package:catalog/widgets/drawer.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -34,6 +36,11 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, MyRoutes.CartRoute),
+        backgroundColor: MyTheme.color1,
+        child: Icon(CupertinoIcons.cart),
+      ),
       body: SafeArea(
         child: Container(
           padding: Vx.m32,
@@ -119,7 +126,7 @@ class CatalogItem extends StatelessWidget {
                           backgroundColor:
                               MaterialStateProperty.all(MyTheme.color1),
                           shape: MaterialStateProperty.all(StadiumBorder())),
-                      child: "Buy".text.make())
+                      child: "Add to Cart".text.make())
                 ],
               ).pOnly(right: 8.0)
             ],
