@@ -1,3 +1,5 @@
+import 'package:catalog/core/store.dart';
+import 'package:catalog/models/cartModel.dart';
 import 'package:catalog/models/catalog.dart';
 import 'package:catalog/pages/home_detail.dart';
 import 'package:catalog/utils/routes.dart';
@@ -35,11 +37,14 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final _cart = (VxState.store as MyStore).cart;
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, MyRoutes.CartRoute),
-        backgroundColor: MyTheme.color1,
-        child: Icon(CupertinoIcons.cart),
+      floatingActionButton: VxBuilder<MyStore>(
+        builder: (context, store, VxStatus) => FloatingActionButton(
+          onPressed: () => Navigator.pushNamed(context, MyRoutes.CartRoute),
+          backgroundColor: MyTheme.color1,
+          child: Icon(CupertinoIcons.cart),
+        ).badge(color: Vx.red600, size: 20, count: _cart.items.length),
       ),
       body: SafeArea(
         child: Container(
@@ -120,13 +125,7 @@ class CatalogItem extends StatelessWidget {
                 buttonPadding: Vx.mH8,
                 children: [
                   "\$${catalog.price}".text.bold.xl.make(),
-                  ElevatedButton(
-                      onPressed: () {},
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(MyTheme.color1),
-                          shape: MaterialStateProperty.all(StadiumBorder())),
-                      child: "Add to Cart".text.make())
+                  _AddtoCart(catalog: catalog)
                 ],
               ).pOnly(right: 8.0)
             ],
@@ -134,5 +133,35 @@ class CatalogItem extends StatelessWidget {
         ],
       ),
     ).white.roundedLg.square(150).make().py16();
+  }
+}
+
+class _AddtoCart extends StatelessWidget {
+  final Item catalog;
+  _AddtoCart({
+    Key key,
+    this.catalog,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final CartModel _cart = (VxState.store as MyStore).cart;
+
+    bool isinCart = _cart.items.contains(catalog) ?? false;
+
+    return ElevatedButton(
+        onPressed: () {
+          if (!isinCart) {
+            isinCart = isinCart.toggle();
+
+            final _catalog = CatalogModel();
+            _cart.catalog = _catalog;
+            _cart.add(catalog);
+          }
+        },
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(MyTheme.color1),
+            shape: MaterialStateProperty.all(StadiumBorder())),
+        child: isinCart ? Icon(Icons.done) : "Add to Cart".text.make());
   }
 }
